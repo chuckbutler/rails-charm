@@ -1,0 +1,37 @@
+options:
+  repo:
+    type: string
+    default: ''
+    description: Application repository URL
+  revision:
+    type: string
+    default: HEAD
+    description: "The revision to be checked out. This can be symbolic, like HEAD or it can be a source control management-specific revision identifier."
+  scm_provider:
+    type: string
+    default: git
+    description: The name of the source control management provider to be used (git or svn).
+  deploy_key:
+    type: string
+    default: ''
+    description: A deploy key is an SSH key that is stored on the server and grants access to a repository (git only).
+  svn_username:
+    type: string
+    default: ''
+    description: The password for the user that has access to the Subversion repository (svn only).
+  svn_password:
+    type: string
+    default: ''
+    description: The user name for a user that has access to the Subversion repository (svn only).
+  rack_env:
+    type: string
+    default: production
+    description: Both RACK_ENV and RAILS_ENV environment variables.
+  extra_packages:
+    type: string
+    default: ''
+    description: Extra packages to install before bundle install
+  env:
+    type: string
+    default: ''
+    description: "List of environment variables (e.g. SECRET_TOKEN=secret_token). These variables will override those which were set by Rack charm (like DATABASE_URL, REDIS_URL)"

@@ -1,0 +1,49 @@
+#!/bin/sh
+
+teardown() {
+    juju destroy-service html2haml
+    if [ -n "$datadir" ] ; then
+        if [ -f $datadir/passed ]; then
+            rm -r $datadir
+        else
+            echo $datadir preserved
+        fi
+    fi
+}
+
+trap teardown EXIT
+
+juju deploy rack --config html2haml.yml html2haml
+juju expose html2haml
+
+for try in `seq 1 600` ; do
+    host=`juju status | get-unit-info html2haml public-address`
+    if [ -z "$host" ] ; then
+        sleep 1
+    else
+        break
+    fi
+done
+
+if [ -z "$host" ] ; then
+    echo FAIL: status timed out
+    exit 1
+fi
+
+datadir=`mktemp -d ${TMPDIR:-/tmp}/wget.test.XXXXXXX`
+echo INFO: datadir=$datadir
+
+wget --tries=100 --timeout=6 http://$host/ -O - -a $datadir/wget.log | grep -q '<title>' || continue
+
+if [ $try -eq 600 ] ; then
+    echo FAIL: Timed out waiting.
+    exit 1
+fi
+
+touch $datadir/passed
+
+trap - EXIT
+teardown
+
+echo PASS: deployed successfully
+exit 0

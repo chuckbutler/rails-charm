@@ -1,0 +1,4 @@
+#!/bin/bash
+
+COMMAND="$@"
+sudo su - deploy -c "<%= wrap_bundle(["cd #{node[:rack][:root]}/current", 'rack_bundle exec $COMMAND']) %>"

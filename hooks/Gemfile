@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+
+gem 'chef', '~> 11.6.0'
+gem 'foreman', '~> 0.63'
+gem 'activesupport', '~> 4.0.0'

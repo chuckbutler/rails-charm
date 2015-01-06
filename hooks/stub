@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+export HOME=/root
+export PATH=$PATH:/usr/local/rvm/bin
+source /usr/local/rvm/scripts/rvm
+
+hook_name=$(basename $0)
+
+if [[ "$hook_name" == *-relation-* ]]; then
+  cookbook_name="${hook_name%-relation*}-relation"
+  recipe_name=${hook_name#*relation-}
+  else
+  cookbook_name='rack'
+  recipe_name=$hook_name
+fi
+
+juju_chef-solo -o "recipe[juju::bootstrap],recipe[$cookbook_name::$recipe_name]"
