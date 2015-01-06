@@ -15,21 +15,17 @@ define :bundle, action: :install do
     end
   end
 
-  ruby_version_string = run_with_wrap_bundle(["cd #{params[:name]}", "bundle platform --ruby"]).chomp
+  # ruby_version_string = run_with_wrap_bundle(["cd #{params[:name]}", "bundle platform --ruby"]).chomp
 
-  if ruby_version_string == "No ruby version specified"
-    ruby_version_string = run('rvm current')
-  else
+  #if ruby_version_string == "No ruby version specified"
+    ruby_version_string = run('rbenv version')
+  #else
     ruby_version_string = ruby_version_string.sub('(', '').sub(')', '').split.join('-')
 
-    execute "rvm install #{ruby_version_string}" do
+    execute "rbenv install #{ruby_version_string}" do
       action :run
     end
-  end
-
-  execute "rvm wrapper #{ruby_version_string} rack bundle" do
-    action :run
-  end
+  #end
 
   file "#{params[:name]}/.ruby-version" do
     action :create
@@ -42,7 +38,7 @@ define :bundle, action: :install do
 
   execute 'bundle install' do
     action :run
-    command wrap_bundle("rack_bundle install --without #{bundle_without} --path #{node[:rack][:root]}/shared/bundle")
+    command wrap_bundle("bundle install --without #{bundle_without}")
     cwd params[:name]
     group params[:group]
     user params[:user]

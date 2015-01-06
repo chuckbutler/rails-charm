@@ -2,8 +2,8 @@
 set -e
 
 export HOME=/root
-export PATH=$PATH:/usr/local/rvm/bin
-source /usr/local/rvm/scripts/rvm
+export PATH=$PATH:/opt/rbenv/bin:$CHARM_DIR/hooks/bin
+source $HOME/.bashrc
 
 hook_name=$(basename $0)
 
@@ -15,4 +15,4 @@ if [[ "$hook_name" == *-relation-* ]]; then
   recipe_name=$hook_name
 fi
 
-juju_chef-solo -o "recipe[juju::bootstrap],recipe[$cookbook_name::$recipe_name]"
+chef-solo -c /etc/chef/solo.rb -o "recipe[juju::bootstrap],recipe[$cookbook_name::$recipe_name]"

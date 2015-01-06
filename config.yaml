@@ -1,7 +1,7 @@
 options:
   repo:
     type: string
-    default: ''
+    default: 'https://github.com/chuckbutler/rails-sample.git'
     description: Application repository URL
   revision:
     type: string
@@ -29,9 +29,13 @@ options:
     description: Both RACK_ENV and RAILS_ENV environment variables.
   extra_packages:
     type: string
-    default: ''
+    default: 'libsqlite3-dev'
     description: Extra packages to install before bundle install
   env:
     type: string
     default: ''
     description: "List of environment variables (e.g. SECRET_TOKEN=secret_token). These variables will override those which were set by Rack charm (like DATABASE_URL, REDIS_URL)"
+  rbenv_installs:
+    type: string
+    defaut: '2.1.5'
+    description: "Default ruby version to use as system ruby with rbenv"

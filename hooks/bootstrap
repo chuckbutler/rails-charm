@@ -1,22 +1,43 @@
 #!/bin/bash
-set -e
+set -ex
 
 export HOME=/root
+RUBY_VERSION=`config-get rbenv_installs`
+
+if [ -z $RUBY_VERSION ]; then
+  export RUBY_VERSION='2.1.5'
+fi
 
 apt-get update
-apt-get install -y curl build-essential
+sudo apt-get install -y git-core curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev python-software-properties
 
-$CHARM_DIR/hooks/rvm-installer.sh stable
+if [ ! -d /usr/local/rbenv ]; then
+	# Install RBENV and RUBYBUILD in /opt/rbenv
+	cd /usr/local
+	git clone git://github.com/sstephenson/rbenv.git rbenv
+	echo 'export PATH="/usr/local/rbenv/bin:$PATH"' >> $HOME/.bashrc
+	echo 'eval "$(rbenv init -)"' >> $HOME/.bashrc
+  echo 'export PATH="/usr/local/rbenv/bin:$PATH"' >> /etc/skel/.bashrc
+  echo 'eval "$(rbenv init -)"' >> /etc/skel/.bashrc
+  source $HOME/.bashrc
 
-export PATH=$PATH:/usr/local/rvm/bin
-source /usr/local/rvm/scripts/rvm
+	git clone git://github.com/sstephenson/ruby-build.git /opt/rbenv/plugins/ruby-build
+	echo 'export PATH="/usr/local/rbenv/plugins/ruby-build/bin:$PATH"' >> $HOME/.bashrc
+  echo 'export PATH="/usr/local/rbenv/plugins/ruby-build/bin:$PATH"' >> /etc/skel/.bashrc
+	# it got a bit racey
+  sleep 2
+	source $HOME/.bashrc
 
-rvm install ruby --default
-rvm use ruby
+  chgrp -R staff /usr/local/rbenv
+  chmod -R g+rwxXs /usr/local/rbenv
 
-cd $CHARM_DIR/hooks && bundle install
+	rbenv install $RUBY_VERSION
+	rbenv global $RUBY_VERSION
 
-rvm wrapper ruby juju chef-solo bundle
+	gem install bundler
+fi
+
+cd $CHARM_DIR/hooks && bundle install --deployment --binstubs
 
 configure_chef_solo() {
   cat > /etc/chef/solo.rb <<EOF
